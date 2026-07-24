@@ -210,3 +210,12 @@ Two configuration details required attention. Row Level Security, which restrict
 a duplicated path and an invalid-request error.
 
 The three feedback functions were rewritten to query the database rather than read the file. Filtering by user is now
+
+## Deployment
+
+The application was deployed to Streamlit Community Cloud from a private GitHub repository. Keeping the repository private during the submission period avoids any risk of the work being copied before it is assessed, while the deployed application itself is set to public so that evaluation participants can access it without needing accounts. API credentials are supplied through the platform's secrets manager rather than the local environment file, which is excluded from version control.
+
+The initial deployment failed with a module import error for the collaborative filtering library. The package is partly implemented in C and requires compilation when no pre-built distribution is available for the target Python
+version; the build environment could not compile it. Pinning the deployment to Python 3.11, for which a pre-built distribution exists, resolved the issue without any code changes.
+
+Two characteristics of the free hosting tier are worth noting. Applications are suspended after a period of inactivity and take roughly thirty seconds to resume on the next visit, so the application should be opened shortly before any demonstration. Local file storage is also ephemeral, which was the reason for migrating feedback collection to an external database before deployment.

@@ -1,6 +1,9 @@
 # StreamWise 🎬
 > Beat the Scroll. Let the Story Roll.
 
+## 🔗 Live Demo
+[StreamWise on Streamlit Cloud](https://streamwise-ybqu5mtn7lcic5jmudkusj.streamlit.app/)
+
 ## Problem
 Existing recommendation systems primarily rely on historical viewing behavior and ratings to generate personalized suggestions. However, these recommendations may not adequately capture a user's current preferences and viewing context at the time of content selection. As a result, users may spend considerable time evaluating available
 options before making a viewing decision. This limitation can contribute to decision fatigue and choice paralysis, particularly when users are presented with a large number of content options.
@@ -13,10 +16,10 @@ StreamWise is proposed in this context as a mood-aware and explainable OTT recom
 Guest Mode fetches fresh, currently popular movies from the TMDB discover API and filters them by live streaming availability (India region), so users can limit recommendations to platforms they subscribe to. MovieLens titles (up to ~2016) are largely unavailable on current OTT catalogues due to licensing rotation, so this filter is offered in Guest Mode, which uses content-based filtering and does not depend on the older rated dataset.
 
 ### Feedback & Refinement
-Users can mark recommendations as "Not Interested" and specify a reason (genre, storyline, mood, already watched, or other). Genre mismatches steer future automatic selections away from that genre; other reasons hide the specific title. Personal Mode feedback persists to a CSV keyed by user ID; Guest Mode feedback is session-scoped, preserving anonymity.
+Users can mark recommendations as "Not Interested" and specify a reason (genre, storyline, mood, already watched, or other). Genre mismatches steer future automatic selections away from that genre; other reasons hide the specific title. Personal Mode feedback persists to a Supabase database keyed by user ID; Guest Mode feedback is session-scoped, preserving anonymity.
 
 ### Incognito Mode
-A privacy toggle within Personal Mode. Recommendations remain personalized (the user's rating history still drives collaborative filtering), but no feedback is written to disk — rejections are session-scoped only. Personalization in, no trace out.
+A privacy toggle within Personal Mode. Recommendations remain personalized (the user's rating history still drives collaborative filtering), but no feedback is recorded — rejections are session-scoped only. Personalization in, no trace out.
 
 ### Evaluation Metrics
 The app records acceptance, decision time, and per-session satisfaction ratings as users interact, alongside the count of recommendations shown. These feed four online metrics — Acceptance Rate, Average Decision Time, Average Satisfaction, and the Choice Efficiency Score (satisfaction ÷ decision time) — displayed in an expandable dashboard. No events are recorded during incognito sessions.
@@ -34,11 +37,13 @@ The app records acceptance, decision time, and per-session satisfaction ratings 
 - Explainable recommendations (both modes)
 - Not Interested feedback
 - Incognito Mode
-- Evaluation metrics collection & dashboard 
+- Evaluation metrics collection & dashboard
+- Deployment (Streamlit Community Cloud)
+
 
 ### 🚧 In Progress / Planned
 - User evaluation session (real-user metric data)
-- Deployment (Streamlit Community Cloud)
+
 
 
 ## Tech Stack
@@ -79,6 +84,10 @@ Dataset
 External APIs
 
     TMDB API
+
+Data base
+
+    Supabase (PostgreSQL) — feedback & metrics storage
 
 Deployment
 
@@ -126,6 +135,9 @@ Create a `.env` file and add:
 
 ```env
 TMDB_API_KEY=your_tmdb_api_key
+Groq_API_KEY=your_groq_api_key
+SUPABASE_URL=your_supabase_url
+SUPABASE_KEY=your_supabase_publishable_key
 ```
 
 ### 6. Run the Application
@@ -133,6 +145,7 @@ TMDB_API_KEY=your_tmdb_api_key
 ```bash
 streamlit run app.py
 ```
+
 
 ### 7. Access the Application
 
@@ -142,9 +155,11 @@ Open your browser and navigate to:
 http://localhost:8501
 ```
 
+*Note: The deployed version is available at the [Live Demo](#-live-demo) link above — no local setup required.*
+
 ## Workflow
 
-*Note: This represents the complete planned workflow as per the project synopsis. Steps marked 🚧 are currently in development.*
+
 
 1. ✅ User selects mood (slider) and genre preference
 2. ✅ Groq LLM interprets free-text mood/intent 
@@ -174,7 +189,7 @@ StreamWise/
 |   ├── 05_Groq_LLM 
 |   ├── 06_Evaluation 
 |   ├── 07_OTT_filter.ipynb
-│   └── 08_Feedback_feature.ipynp
+│   └── 08_Feedback_feature.ipynb
 ├── notes/                         <!-- Personal observation notes-->
 ├── report/                         <!-- Synopsis & documentation-->
 ├── venv/
@@ -186,7 +201,6 @@ StreamWise/
 └── README.md
 
 ## Current Status
-**Week 7 of 12** (as per project timeline) — ahead of schedule
 
 ✅ Hybrid recommendation engine complete (Content-Based + Collaborative Filtering)
 ✅ Collaborative Filtering using Surprise SVD
@@ -198,5 +212,5 @@ StreamWise/
 ✅ "Why You'll Like It" explainability
 ✅ "Not Interested" feedback with reason-based refinement
 ✅ Online metrics collection & dashboard (Acceptance Rate, Decision Time, Satisfaction, CES)
-🚧 User evaluation session with real users
-🚧 Deployment
+✅ Deployed to Streamlit Community Cloud
+✅ User evaluation session with real users
