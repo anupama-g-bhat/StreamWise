@@ -159,8 +159,6 @@ http://localhost:8501
 
 ## Workflow
 
-
-
 1. ✅ User selects mood (slider) and genre preference
 2. ✅ Groq LLM interprets free-text mood/intent 
 3. ✅ Content-Based Filtering generates recommendations using movie genres, title, and TMDB descriptions
@@ -175,42 +173,48 @@ http://localhost:8501
 
 
 ## Project Structure
+
+```
 StreamWise/
-├── data/                       <!-- MovieLens dataset files -->
+├── data/                        # MovieLens dataset files
 │   ├── movies.csv
 │   ├── ratings.csv
 │   ├── links.csv
 │   └── tags.csv
-├── notebooks/                  <!-- Exploration & development notebooks-->
+├── notebooks/                   # Exploration & development notebooks
 │   ├── 01_BasicExploration.ipynb
 │   ├── 02_Content_Based_Filtering.ipynb
 │   ├── 03_Collaborative_filtering.ipynb
-|   ├── 04_Hybrid_recommendation.ipynb
-|   ├── 05_Groq_LLM 
-|   ├── 06_Evaluation 
-|   ├── 07_OTT_filter.ipynb
+│   ├── 04_Hybrid_recommendation.ipynb
+│   ├── 05_Groq_LLM.ipynb
+│   ├── 06_Evaluation.ipynb
+│   ├── 07_OTT_filter.ipynb
 │   └── 08_Feedback_feature.ipynb
-├── notes/                         <!-- Personal observation notes-->
-├── report/                         <!-- Synopsis & documentation-->
-├── venv/
-├── .env                            <!-- API keys (not pushed to GitHub) -->
+├── notes/                       # Observation notes
+│   └── Observations.md
+├── images/                      # Generated plots
+├── report/                      # Synopsis & documentation
+├── app.py                       # Main Streamlit application
+├── helpers.py                   # Core recommendation functions
+├── requirements.txt             # Python dependencies
+├── .python-version              # Pinned Python version for deployment
 ├── .gitignore
-├── app.py                          <!--Main Streamlit application -->
-├── helpers.py                      <!--Core recommendation functions  -->
-├── requirements.txt                <!-- Python dependencies-->
 └── README.md
+
+```
+
 
 ## Current Status
 
-✅ Hybrid recommendation engine complete (Content-Based + Collaborative Filtering)
-✅ Collaborative Filtering using Surprise SVD
-✅ Offline evaluation complete (RMSE 0.88, Precision@5 0.59)
-✅ Guest, Personal, and Incognito Modes functional
-✅ Streamlit UI with mood-based and free-text input
-✅ Groq LLM intent understanding
-✅ OTT platform filtering (Guest Mode, live TMDB availability)
-✅ "Why You'll Like It" explainability
-✅ "Not Interested" feedback with reason-based refinement
-✅ Online metrics collection & dashboard (Acceptance Rate, Decision Time, Satisfaction, CES)
-✅ Deployed to Streamlit Community Cloud
-✅ User evaluation session with real users
+- ✅ Hybrid recommendation engine complete (Content-Based + Collaborative Filtering)
+- ✅ Collaborative Filtering using Surprise SVD
+- ✅ Offline evaluation complete (RMSE 0.88, Precision@5 0.59)
+- ✅ Guest, Personal, and Incognito Modes functional
+- ✅ Streamlit UI with mood-based and free-text input
+- ✅ Groq LLM intent understanding
+- ✅ OTT platform filtering (Guest Mode, live TMDB availability)
+- ✅ "Why You'll Like It" explainability
+- ✅ "Not Interested" feedback with reason-based refinement
+- ✅ Online metrics collection & dashboard (Acceptance Rate, Decision Time, Satisfaction, CES)
+- ✅ Deployed to Streamlit Community Cloud
+- 🚧 User evaluation session with real users (in progress)
