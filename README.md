@@ -217,4 +217,4 @@ StreamWise/
 - ✅ "Not Interested" feedback with reason-based refinement
 - ✅ Online metrics collection & dashboard (Acceptance Rate, Decision Time, Satisfaction, CES)
 - ✅ Deployed to Streamlit Community Cloud
-- 🚧 User evaluation session with real users (in progress)
+- ✅ User evaluation session with real users (in progress)

@@ -304,7 +304,7 @@ def get_user_intent(user_text):
     Extract the following and return ONLY valid JSON:
     
     {{
-    "mood": one of [Sad, Tired, Neutral, Happy, Excited, null],
+    "mood": one of [Sad, Tired, Neutral, Happy, Excited, Angry, null],
     "genre_preference": genre name or null,
     "reference_title": movie/show name or null,
     "similarity_intent": "similar" or "different" or null,
@@ -340,6 +340,7 @@ def get_user_intent(user_text):
 
 # For LLM logic (no emojis)
 mood_to_genres = {
+    "Angry"   : ["Comedy", "Animation", "Musical"],
     "Sad"     : ["Comedy", "Animation", "Musical"],
     "Tired"   : ["Animation", "Comedy", "Children"],
     "Neutral" : ["Action", "Adventure", "Documentary"],
@@ -670,14 +671,17 @@ def generate_explanation(movie, user_context=""):
         overview = get_movie_description(title)   # fetch it 🎯
 
     prompt = f"""
-    A user is browsing movie recommendations. {user_context}
+    {user_context}
 
     Movie: {title}
     Description: {overview}
 
-    Write ONE short, friendly sentence (max 20 words) explaining why
-    they might enjoy this movie. Be specific to the movie. Do NOT
-    include the movie title. Return ONLY the sentence, no preamble.
+    Write ONE sentence (max 25 words) explaining why this movie suits how
+    they are feeling right now. Connect a specific element of the movie —
+    its tone, story, or characters — to their emotional state.
+    Begin by acknowledging their state, then give the reason.
+    Do NOT summarise the plot. Do NOT include the movie title.
+    Return ONLY the sentence.
     """
 
     response = client.chat.completions.create(

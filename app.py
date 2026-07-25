@@ -17,6 +17,8 @@ if "awaiting_reason" not in st.session_state:
     st.session_state["awaiting_reason"] = None
 if "current_genre" not in st.session_state:
     st.session_state["current_genre"] = ""
+if "user_context" not in st.session_state:
+    st.session_state["user_context"] = ""
 if "guest_rejected" not in st.session_state:
     st.session_state["guest_rejected"] = set()
 if "rating_logged" not in st.session_state:
@@ -51,7 +53,7 @@ def display_movies(titles, user_id, incognito=False):
                 if st.button("🤔", key=f"why_{i}_{title}", help="Why this pick?"):
                     if title not in st.session_state["explanations"]:
                         with st.spinner("💭 Thinking..."):
-                            st.session_state["explanations"][title] = generate_explanation(title)
+                            st.session_state["explanations"][title] = generate_explanation(title, user_context=st.session_state.get("user_context", ""))
             if title in st.session_state["explanations"]:
                 st.info(st.session_state["explanations"][title])
 
@@ -63,7 +65,7 @@ def display_movies(titles, user_id, incognito=False):
                         log_feedback(user_id, title, "accept",
                                      reason=str(decision_time),
                                      genre=st.session_state["current_genre"])
-                        st.success("Great choice!🎬")
+                        st.toast("Noted 👍")
             
             with b3:
                 if st.button("👎", key=f"no_{i}_{title}", help="Not interested"):
@@ -110,7 +112,7 @@ def display_fresh_movies(movies):
                 if st.button("🤔", key=f"why_{i}_{title}", help="Why You'll Like It"):
                     if title not in st.session_state["explanations"]:
                         with st.spinner("💭 Thinking..."):
-                            st.session_state["explanations"][title] = generate_explanation(movie)
+                            st.session_state["explanations"][title] = generate_explanation(movie, user_context=st.session_state.get("user_context", ""))
             if title in st.session_state["explanations"]:
                 st.info(st.session_state["explanations"][title])
             
@@ -163,7 +165,7 @@ if input_mode == "Quick Select":
     # show slider + genre
     # Mood slider
     mood = st.select_slider("How are you feeling ?",
-                            options=["😔 Sad", "😴 Tired", "😐 Neutral", "😊 Happy",  "🤩 Excited"])
+                            options=["😠 Angry","😔 Sad", "😴 Tired", "😐 Neutral", "😊 Happy",  "🤩 Excited"])
 
 
 
@@ -189,6 +191,8 @@ if input_mode == "Quick Select":
 
     # mapping
     mood_suggestions = {
+        "😠 Angry": ["Comedy", "Animation", 
+                     "Musical"],
         "😔 Sad"     : ["Comedy", "Animation", 
                         "Musical"],
         "😴 Tired"   : ["Animation", "Comedy",
@@ -209,6 +213,7 @@ if input_mode == "Quick Select":
     if st.button("Get recommendations🎬"):
         with st.spinner("Finding movies..."):
             st.session_state["current_genre"] = genre
+            st.session_state["user_context"] = f"They are feeling {mood.split()[-1]}."   # strips the emoji
             st.session_state["t_shown"] = time.time()
             if user_id is None:
                 movies = guest_recommendations_with_platform(
@@ -282,10 +287,12 @@ else:
 
     if st.button("Get recommendations🎬"):
         with st.spinner("Finding movies..."):
+
             if user_id is None:
                 intent = get_user_intent(user_text)
                 genre = resolve_genre(intent)
                 st.session_state["current_genre"] = genre
+                st.session_state["user_context"] = f"They described their state as: '{user_text}'."
                 st.session_state["t_shown"] = time.time()
                 movies = guest_recommendations_with_platform(
                         genre_name=genre, user_platforms=selected_platforms, n=12)
@@ -305,6 +312,7 @@ else:
                     rejected, avoided = get_user_feedback(user_id)
                 titles, genre = get_smart_recommendations(user_text, user_id=user_id, n=12)
                 st.session_state["current_genre"] = genre
+                st.session_state["user_context"] = f"They described their state as: '{user_text}'."
                 st.session_state["t_shown"] = time.time()
                 titles = filter_rejected(titles, rejected)
                 titles = list(dict.fromkeys(titles)) 
