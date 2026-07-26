@@ -50,7 +50,7 @@ def display_movies(titles, user_id, incognito=False):
             title = movie["title"]
             b1, b2, b3 = st.columns(3)      # three mini-columns for the buttons
             with b1:
-                if st.button("🤔", key=f"why_{i}_{title}", help="Why this pick?"):
+                if st.button("🤔", key=f"why_{i}_{title}", help="Why You'll Like It?"):
                     if title not in st.session_state["explanations"]:
                         with st.spinner("💭 Thinking..."):
                             st.session_state["explanations"][title] = generate_explanation(title, user_context=st.session_state.get("user_context", ""))

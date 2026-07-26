@@ -219,3 +219,13 @@ The initial deployment failed with a module import error for the collaborative f
 version; the build environment could not compile it. Pinning the deployment to Python 3.11, for which a pre-built distribution exists, resolved the issue without any code changes.
 
 Two characteristics of the free hosting tier are worth noting. Applications are suspended after a period of inactivity and take roughly thirty seconds to resume on the next visit, so the application should be opened shortly before any demonstration. Local file storage is also ephemeral, which was the reason for migrating feedback collection to an external database before deployment.
+
+## Refining Explanation Personalisation
+
+During the evaluation, a participant entered an emotionally specific free-text description of their state and received an explanation describing the film's themes without any reference to the mood expressed. Inspecting the
+implementation showed that the explanation function accepted a user-context parameter, but the application never supplied it — the language model therefore received only the movie's title and overview, and could only describe the film itself rather than its suitability for the user.
+
+Two changes were required. The user's context is now stored when recommendations are generated — the selected mood in the guided input path, and the free-text description in the natural-language path — and passed to the
+explanation function. The prompt was also rewritten: rather than asking why a user might enjoy the film, it now instructs the model to acknowledge the user's stated state, connect a specific element of the film to it, and give the reason, while avoiding plot summary. Both changes were necessary; supplying the context without instructing the model to use it still produced generic descriptions.
+
+The mood vocabulary was also extended. The original set covered sadness, tiredness, neutrality, happiness and excitement, but had no entry for anger — a negative state with high arousal, which the existing options do not represent. Anger was added and mapped to uplifting genres, consistent with the mood-repair approach applied to other negative states. The addition required updating the genre mapping, the language model's permitted mood values, and the interface options together, as any of these alone would produce a mismatch.
