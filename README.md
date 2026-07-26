@@ -39,13 +39,9 @@ The app records acceptance, decision time, and per-session satisfaction ratings 
 - Incognito Mode
 - Evaluation metrics collection & dashboard
 - Deployment (Streamlit Community Cloud)
-
-
-### 🚧 In Progress / Planned
 - User evaluation session (real-user metric data)
 
-
-
+ 
 ## Tech Stack
 Programming Language
 

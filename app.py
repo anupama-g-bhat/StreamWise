@@ -23,6 +23,8 @@ if "guest_rejected" not in st.session_state:
     st.session_state["guest_rejected"] = set()
 if "rating_logged" not in st.session_state:
     st.session_state["rating_logged"] = False
+if "searched" not in st.session_state:
+    st.session_state["searched"] = False
 
 # display function
 def display_movies(titles, user_id, incognito=False):
@@ -214,6 +216,7 @@ if input_mode == "Quick Select":
         with st.spinner("Finding movies..."):
             st.session_state["current_genre"] = genre
             st.session_state["user_context"] = f"They are feeling {mood.split()[-1]}."   # strips the emoji
+            st.session_state["searched"] = True
             st.session_state["t_shown"] = time.time()
             if user_id is None:
                 movies = guest_recommendations_with_platform(
@@ -252,6 +255,8 @@ if input_mode == "Quick Select":
         display_fresh_movies(st.session_state["guest_movies"])
     elif st.session_state["personal_movies"]:
         display_movies(st.session_state["personal_movies"], user_id, incognito)
+    elif st.session_state["searched"]:
+        st.warning("😕 No movies found for that combination. Try fewer platform filters or a different genre.")
     
     # Satisfaction rating — shown once results exist
     if st.session_state["guest_movies"] or st.session_state["personal_movies"]:
@@ -287,6 +292,7 @@ else:
 
     if st.button("Get recommendations🎬"):
         with st.spinner("Finding movies..."):
+            st.session_state["searched"] = True
 
             if user_id is None:
                 intent = get_user_intent(user_text)
@@ -332,6 +338,8 @@ else:
         display_fresh_movies(st.session_state["guest_movies"])
     elif st.session_state["personal_movies"]:
         display_movies(st.session_state["personal_movies"], user_id, incognito)
+    elif st.session_state["searched"]:
+        st.warning("😕 No movies found for that combination. Try fewer platform filters or a different genre.")
     
     # Satisfaction rating — shown once results exist
     if st.session_state["guest_movies"] or st.session_state["personal_movies"]:
