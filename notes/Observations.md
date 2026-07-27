@@ -229,3 +229,18 @@ Two changes were required. The user's context is now stored when recommendations
 explanation function. The prompt was also rewritten: rather than asking why a user might enjoy the film, it now instructs the model to acknowledge the user's stated state, connect a specific element of the film to it, and give the reason, while avoiding plot summary. Both changes were necessary; supplying the context without instructing the model to use it still produced generic descriptions.
 
 The mood vocabulary was also extended. The original set covered sadness, tiredness, neutrality, happiness and excitement, but had no entry for anger — a negative state with high arousal, which the existing options do not represent. Anger was added and mapped to uplifting genres, consistent with the mood-repair approach applied to other negative states. The addition required updating the genre mapping, the language model's permitted mood values, and the interface options together, as any of these alone would produce a mismatch.
+
+## User Evaluation Results
+
+The deployed application was evaluated with approximately ten participants, who used it independently on their own devices. Because Guest Mode is anonymous by design, individual sessions cannot be distinguished within the collected data; results are therefore reported as aggregate activity. Analysis is restricted to the evaluation dates, excluding developer testing conducted on other days. Activity in Incognito Mode is deliberately not recorded, so any evaluation conducted in that mode is absent from the dataset — an inherent consequence of
+offering a no-tracking option.
+
+In Guest Mode, twenty-five search sessions produced one hundred and fifty recommendations, of which nineteen were accepted, giving an acceptance rate of 12.7%. Because each search presents six recommendations and a user typically
+selects at most one, the acceptance rate is structurally bounded at approximately 16.7%; the observed figure represents roughly three-quarters of that maximum. Median decision time was 40.2 seconds, reported in preference to
+the mean of 50.0 seconds as it is less affected by extended sessions arising from unsupervised remote testing. Eleven session ratings were recorded, of which nine were four or above on a five-point scale, giving an average of
+3.91. Only three rejections occurred, none of which cited a genre mismatch.
+
+A supplementary session evaluated Personal Mode, which the first cohort had not used. Fifteen sessions produced ninety recommendations with seven acceptances (7.8%), a median decision time of 28.5 seconds, and an average satisfaction of 3.27. Satisfaction here was polarised rather than uniformly moderate, with three ratings of one and four of five, in contrast to the tight clustering around four observed in Guest Mode.
+
+The lower and more variable satisfaction in Personal Mode is best explained by the evaluation design rather than the recommendation approach. Participants were assigned MovieLens user identifiers and therefore received recommendations derived from another individual's rating history rather than their own. Where an assigned profile happened to align with a participant's taste, satisfaction was high; where it did not, it was low. The bimodal distribution is consistent with this explanation. Guest Mode, by contrast, draws on current popular titles with
+poster and availability information, which are more immediately recognisable.
