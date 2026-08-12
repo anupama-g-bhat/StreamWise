@@ -178,13 +178,16 @@ if input_mode == "Quick Select":
         selected_platforms = st.multiselect(
             "Select your streaming platforms",
             ["Netflix", "Amazon Prime Video", "JioHotstar", "Sony Liv"])
+        
+        st.markdown("**🌐 Language (optional):**")
+        language = st.selectbox("Preferred language",
+                    ["Any", "English", "Hindi", "Kannada", "Telugu", "Tamil", "Malayalam", "Korean"])
+        language = None if language == "Any" else language
     else:
         st.caption("📺 Platform filter available in Guest Mode")
+        language = None 
 
-    st.markdown("**🌐 Language (optional):**")
-    language = st.selectbox("Preferred language",
-            ["Any", "English", "Hindi", "Kannada", "Telugu", "Tamil", "Malayalam", "Korean"])
-    language = None if language == "Any" else language
+    
 
     # Genre based on mood suggestion
     genres = [
@@ -301,8 +304,14 @@ else:
         selected_platforms = st.multiselect(
             "Select your streaming platforms",
             ["Netflix", "Amazon Prime Video", "JioHotstar","Sony Liv"])
+        
+        st.markdown("**🌐 Language (optional override):**")
+        language_override = st.selectbox(
+            "Preferred language",
+            ["Auto-detect", "English", "Hindi", "Kannada", "Telugu", "Tamil", "Malayalam", "Korean"])
     else:
         st.caption("📺 Platform filter available in Guest Mode")
+        language_override = "Auto-detect"
 
     if st.button("Get recommendations🎬"):
         with st.spinner("Finding movies..."):
@@ -311,7 +320,10 @@ else:
             if user_id is None:
                 intent = get_user_intent(user_text)
                 genre = resolve_genre(intent)
-                language = intent.get("language") 
+                language = intent.get("language")
+                if language_override != "Auto-detect":
+                    language = language_override        # explicit choice wins over LLM guess
+
                 st.session_state["current_genre"] = genre
                 st.session_state["user_context"] = f"They described their state as: '{user_text}'."
                 st.session_state["t_shown"] = time.time()
