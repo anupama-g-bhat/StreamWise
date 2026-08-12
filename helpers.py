@@ -297,6 +297,8 @@ client = Groq(api_key=os.getenv("Groq_API_KEY"))
 
     
 #8
+
+
 def get_user_intent(user_text):
     prompt = f"""
     User said: "{user_text}"
@@ -309,7 +311,8 @@ def get_user_intent(user_text):
     "reference_title": movie/show name or null,
     "similarity_intent": "similar" or "different" or null,
     "avoid_genres": list of genres to avoid or empty list,
-    "vibe": one of [feel-good, suspense, dark, light, emotional, joyful, heartfelt, revenge, inspirational, null]
+    "vibe": one of [feel-good, suspense, dark, light, emotional, joyful, heartfelt, revenge, inspirational, null],
+    "language": one of [English, Hindi, Kannada, Telugu, Tamil, Malayalam, Korean, null]
     }}
     
     Available genres: Action, Adventure, Animation, Children, 
@@ -318,6 +321,11 @@ def get_user_intent(user_text):
     
     Note: "rom-com" means Romance + Comedy.
     Only include what's explicitly or implicitly mentioned.
+
+    Note: Only set "language" if the user explicitly mentions a language,
+    region, or a reference title strongly associated with one (e.g.
+    "Korean movie", "Tamil film", "something like Parasite").
+    Otherwise leave it null.
     """
     
     response = client.chat.completions.create(
@@ -335,7 +343,8 @@ def get_user_intent(user_text):
             "mood": None, "genre_preference": None,
             "reference_title": None, "similarity_intent": None,
             "avoid_genres": [],
-            "vibe" : None
+            "vibe" : None,
+            "language" : None
         }
 
 # For LLM logic (no emojis)
@@ -570,6 +579,17 @@ PLATFORM_IDS = {
     "YouTube": 192,
 }
 
+LANGUAGE_CODES = {
+    "Any": None,
+    "English": "en",
+    "Hindi": "hi",
+    "Kannada": "kn",
+    "Telugu": "te",
+    "Tamil": "ta",
+    "Malayalam": "ml",
+    "Korean": "ko",
+}
+
 #16
 def get_genre_id(llm_genre):
     tmdb_name = LLM_TO_TMDB_GENRE.get(llm_genre, llm_genre)   # translate, or keep as-is
@@ -578,26 +598,40 @@ def get_genre_id(llm_genre):
     return genre_id
 
 #17
-def discover_movies_by_genre(genre_id, n=20, provider_ids=None):
-    try:
-        url = "https://api.themoviedb.org/3/discover/movie"
-        params = {
-            "api_key": TMDB_API_KEY,
-            "with_genres": genre_id,
-            "sort_by": "popularity.desc",
-            "watch_region": "IN",
-            "vote_count.gte": 100,
-            "page": random.randint(1, 3),
-        }
-        # if platforms given, ask TMDB for movies ON those platforms
-        if provider_ids:
-            params["with_watch_providers"] = "|".join(str(pid) for pid in provider_ids)
-            params["watch_region"] = "IN"
+def discover_movies_by_genre(genre_id, n=20, provider_ids=None, language=None):
+    url = "https://api.themoviedb.org/3/discover/movie"
+    is_regional = language in ["kn", "te", "ml", "ta"]
 
-        response = requests.get(url, params=params, timeout=5).json()
-        return response.get("results", [])[:n]
-    except:
-        return []          # network died → return empty, don't crash
+    params = {
+        "api_key": TMDB_API_KEY,
+        "with_genres": genre_id,
+        "sort_by": "popularity.desc",
+        "watch_region": "IN",
+    }
+    if not is_regional:
+        params["vote_count.gte"] = 100     # standard gate for global content
+    if provider_ids:
+        params["with_watch_providers"] = "|".join(str(pid) for pid in provider_ids)
+        params["watch_region"] = "IN"
+        params["with_watch_monetization_types"] = "flatrate"
+    if language:
+        params["with_original_language"] = language
+
+    # Step 1: fetch page 1 to learn how many pages actually exist
+    first = requests.get(url, params={**params, "page": 1}, timeout=5).json()
+    total_pages = first.get("total_pages", 1)
+
+    # Step 2: pick a random page within the REAL range (capped at 10 to avoid
+    # drifting into very obscure, low-popularity results even for regional content)
+    max_page = min(total_pages, 10)
+    page = random.randint(1, max_page)
+
+    if page == 1:
+        return first.get("results", [])[:n]      # reuse — no extra call needed
+    
+    response = requests.get(url, params={**params, "page": page}, timeout=5).json()
+    return response.get("results", [])[:n]
+
 
 #18
 def get_providers_by_id(movie_id, region="IN"):
@@ -612,17 +646,24 @@ def get_providers_by_id(movie_id, region="IN"):
     except:
         return []
 
+
+
 #19
-def guest_recommendations_with_platform(genre_name, user_platforms=None, n=5, region="IN"):
+def guest_recommendations_with_platform(genre_name, user_platforms=None, n=5, region="IN",language=None):
     genre_id = get_genre_id(genre_name)
+    
 
     # NEW — convert platform names → provider IDs
     provider_ids = None
     if user_platforms:
         provider_ids = [PLATFORM_IDS[p] for p in user_platforms if p in PLATFORM_IDS]
 
+    lang_code = LANGUAGE_CODES.get(language)   # None if not found or not given
+    
     # Pass provider_ids into discover
-    buffer = discover_movies_by_genre(genre_id, n=n * 4, provider_ids=provider_ids)
+    buffer = discover_movies_by_genre(genre_id, n=n * 4, provider_ids=provider_ids, language=lang_code)
+
+    
 
     survivors = []
     for movie in buffer:

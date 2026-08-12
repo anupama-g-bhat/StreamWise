@@ -15,6 +15,10 @@ StreamWise is proposed in this context as a mood-aware and explainable OTT recom
 ### OTT Platform Filtering
 Guest Mode fetches fresh, currently popular movies from the TMDB discover API and filters them by live streaming availability (India region), so users can limit recommendations to platforms they subscribe to. MovieLens titles (up to ~2016) are largely unavailable on current OTT catalogues due to licensing rotation, so this filter is offered in Guest Mode, which uses content-based filtering and does not depend on the older rated dataset.
 
+### Language Filtering
+Guest Mode can filter recommendations by original language, extracted from natural-language input or an explicit selector. Personal Mode does not support this — MovieLens contains only two titles referencing Indian cinema, so there is no regional content to filter. The vote-count quality threshold used elsewhere is relaxed for regional languages, whose smaller catalogues would otherwise be filtered to near-zero results, and the result-page range is
+determined dynamically to sample the catalogue that actually exists.
+
 ### Feedback & Refinement
 Users can mark recommendations as "Not Interested" and specify a reason (genre, storyline, mood, already watched, or other). Genre mismatches steer future automatic selections away from that genre; other reasons hide the specific title. Personal Mode feedback persists to a Supabase database keyed by user ID; Guest Mode feedback is session-scoped, preserving anonymity.
 
@@ -34,6 +38,7 @@ The app records acceptance, decision time, and per-session satisfaction ratings 
 - TMDB poster integration
 - Groq LLM mood understanding 
 - OTT platform filtering (Guest Mode)
+- Regional language filtering (Guest Mode) — English, Hindi, Kannada, Telugu, Tamil, Malayalam, Korean
 - Explainable recommendations (both modes)
 - Not Interested feedback
 - Incognito Mode
@@ -209,6 +214,7 @@ StreamWise/
 - ✅ Streamlit UI with mood-based and free-text input
 - ✅ Groq LLM intent understanding
 - ✅ OTT platform filtering (Guest Mode, live TMDB availability)
+- ✅ Regional language filtering (Guest Mode) — English, Hindi, Kannada, Telugu, Tamil, Malayalam, Korean
 - ✅ "Why You'll Like It" explainability
 - ✅ "Not Interested" feedback with reason-based refinement
 - ✅ Online metrics collection & dashboard (Acceptance Rate, Decision Time, Satisfaction, CES)

@@ -181,6 +181,11 @@ if input_mode == "Quick Select":
     else:
         st.caption("📺 Platform filter available in Guest Mode")
 
+    st.markdown("**🌐 Language (optional):**")
+    language = st.selectbox("Preferred language",
+            ["Any", "English", "Hindi", "Kannada", "Telugu", "Tamil", "Malayalam", "Korean"])
+    language = None if language == "Any" else language
+
     # Genre based on mood suggestion
     genres = [
         "Action", "Adventure", "Animation",
@@ -208,6 +213,16 @@ if input_mode == "Quick Select":
     }
 
 
+    LANGUAGE_CODES = {
+    "Any": None,
+    "English": "en",
+    "Hindi": "hi",
+    "Kannada": "kn",
+    "Telugu": "te",
+    "Tamil": "ta",
+    "Malayalam": "ml",
+    "Korean": "ko",
+    }
 
     # But user can change
     genre = st.selectbox("Pick a genre", genres, index=genres.index(mood_suggestions[mood][0]))
@@ -219,8 +234,7 @@ if input_mode == "Quick Select":
             st.session_state["searched"] = True
             st.session_state["t_shown"] = time.time()
             if user_id is None:
-                movies = guest_recommendations_with_platform(
-                    genre_name=genre, user_platforms=selected_platforms, n=12)
+                movies = guest_recommendations_with_platform(genre_name=genre, user_platforms=selected_platforms, n=12, language=language)
                 movies = filter_rejected(movies, st.session_state["guest_rejected"])
                 st.session_state["guest_movies"] = movies[:6]
                 st.session_state["personal_movies"] = []
@@ -297,11 +311,11 @@ else:
             if user_id is None:
                 intent = get_user_intent(user_text)
                 genre = resolve_genre(intent)
+                language = intent.get("language") 
                 st.session_state["current_genre"] = genre
                 st.session_state["user_context"] = f"They described their state as: '{user_text}'."
                 st.session_state["t_shown"] = time.time()
-                movies = guest_recommendations_with_platform(
-                        genre_name=genre, user_platforms=selected_platforms, n=12)
+                movies = guest_recommendations_with_platform(genre_name=genre, user_platforms=selected_platforms, n=12, language=language)
                 movies = filter_rejected(movies, st.session_state["guest_rejected"])
                 st.session_state["guest_movies"] = movies[:6]
                 st.session_state["personal_movies"] = []
